@@ -1,6 +1,6 @@
 // --- GENERAL APP CONFIGURATION ---
 export const APP_CONFIG = {
-    title: "FusionDocJF",
+    title: "FusionDoc",
     subtitle: "Next-Gen Documentation",
     icon: "/assets/logo.png", // Path in the `/public` folder or a full URL
 };
@@ -156,7 +156,7 @@ export const I18N_CONFIG = {
 export const VERSION_CONFIG = {
     enabled: true,
     defaultVersion: 'v2.0',
-    versions: ['v2.0'],
+    versions: ['v2.0','v1.0'],
 };
 
 // --- MAINTENANCE MODE ---
