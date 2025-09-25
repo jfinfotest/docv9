@@ -4,6 +4,14 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import fs from 'fs';
 
+// Leer configuración de GitHub dinámicamente
+const githubConfigPath = path.join(__dirname, 'public', 'github-config.json');
+const githubConfig = fs.existsSync(githubConfigPath) 
+  ? JSON.parse(fs.readFileSync(githubConfigPath, 'utf-8'))
+  : { baseUrl: '/', repository: '' };
+
+const baseUrl = githubConfig.baseUrl || '/';
+
 // Plugin para copiar temas de Prism durante el desarrollo
 const copyPrismThemes = () => {
   return {
@@ -80,6 +88,7 @@ const copyPrismThemes = () => {
 
 
 export default defineConfig({
+  base: baseUrl,
   plugins: [
     react(), 
     copyPrismThemes(),
@@ -96,8 +105,8 @@ export default defineConfig({
         theme_color: '#01403A',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: baseUrl,
+        start_url: baseUrl,
         lang: 'en',
         orientation: 'portrait-primary',
         categories: ['productivity', 'education'],
