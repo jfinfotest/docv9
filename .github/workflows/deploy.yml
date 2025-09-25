@@ -37,8 +37,9 @@ jobs:
       
     - name: Adapt paths for GitHub Pages
       run: |
-        # Leer configuración del repositorio
-        REPO_NAME=$(cat public/github-config.json | grep -o '"baseUrl": "[^"]*"' | cut -d'"' -f4 | sed 's|/||g')
+        # Extraer nombre del repositorio del archivo de configuración
+        REPO_NAME=$(node -p "JSON.parse(require('fs').readFileSync('public/github-config.json', 'utf8')).baseUrl.replace(/\//g, '')")
+        echo "Repository name: $REPO_NAME"
         
         # Actualizar rutas en index.html
         sed -i "s|href=\"/|href=\"/$REPO_NAME/|g" dist/index.html
@@ -48,6 +49,11 @@ jobs:
         if [ -f dist/manifest.webmanifest ]; then
           sed -i "s|\"start_url\":\"/\"|\"start_url\":\"/$REPO_NAME/\"|g" dist/manifest.webmanifest
           sed -i "s|\"scope\":\"/\"|\"scope\":\"/$REPO_NAME/\"|g" dist/manifest.webmanifest
+          # Actualizar rutas de iconos en el manifest
+          sed -i "s|\"src\":\"pwa_icons/|\"src\":\"/$REPO_NAME/pwa_icons/|g" dist/manifest.webmanifest
+          sed -i "s|\"src\":\"favicon.ico\"|\"src\":\"/$REPO_NAME/favicon.ico\"|g" dist/manifest.webmanifest
+          sed -i "s|\"src\":\"apple-touch-icon.png\"|\"src\":\"/$REPO_NAME/apple-touch-icon.png\"|g" dist/manifest.webmanifest
+          sed -i "s|\"src\":\"masked-icon.svg\"|\"src\":\"/$REPO_NAME/masked-icon.svg\"|g" dist/manifest.webmanifest
         fi
         
         # Actualizar service worker si existe

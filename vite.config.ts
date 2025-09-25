@@ -93,6 +93,15 @@ export default defineConfig({
       devOptions: {
         enabled: true
       },
+      useCredentials: false,
+      injectManifest: {
+        injectionPoint: undefined
+      },
+      manifestFilename: 'manifest.webmanifest',
+      disable: false,
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+      },
       manifest: {
         name: 'Static Docs Site',
         short_name: 'DocsSite',
@@ -102,10 +111,7 @@ export default defineConfig({
         display: 'standalone',
         scope: baseUrl,
         start_url: baseUrl,
-        lang: 'en',
-        orientation: 'portrait-primary',
         categories: ['productivity', 'education'],
-        prefer_related_applications: false,
         icons: [
           {
             src: 'favicon.ico',
@@ -161,9 +167,6 @@ export default defineConfig({
             purpose: 'maskable'
           }
         ]
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       }
     })
   ],
