@@ -46,6 +46,12 @@ const preserveExternalModules = () => {
     buildStart() {
       console.log('📦 Backing up external modules...');
       
+      // Ensure dist directory exists
+      const distDir = path.resolve(__dirname, 'dist');
+      if (!fs.existsSync(distDir)) {
+        fs.mkdirSync(distDir, { recursive: true });
+      }
+      
       // Backup each external module
       for (const module of externalModules) {
         const distPath = path.resolve(__dirname, 'dist', module);
@@ -61,6 +67,18 @@ const preserveExternalModules = () => {
             const content = fs.readFileSync(distPath, 'utf-8');
             backups.set(module, { type: 'file', content });
             console.log(`📄 Backed up file: dist/${module}`);
+          }
+        } else if (fs.existsSync(publicPath)) {
+          // If module doesn't exist in dist but exists in public, copy it first
+          if (fs.statSync(publicPath).isDirectory()) {
+            copyDirectory(publicPath, distPath);
+            backups.set(module, { type: 'directory', source: publicPath });
+            console.log(`📁 Copied and marked directory for backup: dist/${module}`);
+          } else {
+            const content = fs.readFileSync(publicPath, 'utf-8');
+            fs.writeFileSync(distPath, content);
+            backups.set(module, { type: 'file', content });
+            console.log(`📄 Copied and backed up file: dist/${module}`);
           }
         }
       }
