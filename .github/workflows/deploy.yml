@@ -30,7 +30,9 @@ jobs:
         node-version: '18'
         
     - name: Adapt paths for GitHub Pages
-      run: node scripts/adapt-paths.cjs
+      run: |
+        cd dist
+        node adapt-paths.cjs
       
     - name: Setup Pages
       uses: actions/configure-pages@v4
