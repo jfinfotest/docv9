@@ -29,17 +29,8 @@ jobs:
       with:
         node-version: '18'
         
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Build project
-      run: npm run build
-      
     - name: Adapt paths for GitHub Pages
       run: node scripts/adapt-paths.cjs
-      
-    - name: Create .nojekyll
-      run: touch dist/.nojekyll
       
     - name: Setup Pages
       uses: actions/configure-pages@v4
