@@ -1,6 +1,6 @@
 // --- GENERAL APP CONFIGURATION ---
 export const APP_CONFIG = {
-    title: "FusionDoc",
+    title: "FusionDocJF",
     subtitle: "Next-Gen Documentation",
     icon: "/assets/logo.png", // Path in the `/public` folder or a full URL
 };
