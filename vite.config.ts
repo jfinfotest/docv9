@@ -85,30 +85,56 @@ const preserveExternalModules = () => {
     },
     resolveId(id, importer) {
       // Redirect constants.js imports to the dist version
-      if (id.includes('public/constants.js') || id.endsWith('constants.js')) {
-        const distPath = path.resolve(__dirname, 'dist/constants.js');
-        console.log(`🔄 Redirecting ${id} to ${distPath}`);
-        return distPath;
+      if (id.includes('constants.js')) {
+        // Handle relative paths like '../../public/constants.js'
+        if (id.includes('public/constants.js') || id.includes('../public/constants.js')) {
+          const distPath = path.resolve(__dirname, 'dist/constants.js');
+          console.log(`🔄 Redirecting ${id} to ${distPath}`);
+          return distPath;
+        }
+        // Handle direct constants.js imports
+        if (id.endsWith('constants.js') && !id.includes('node_modules')) {
+          const distPath = path.resolve(__dirname, 'dist/constants.js');
+          console.log(`🔄 Redirecting ${id} to ${distPath}`);
+          return distPath;
+        }
       }
       return null;
     },
     buildEnd() {
-      console.log('✅ Restoring external modules...');
+      console.log('✅ Preserving external modules...');
       
-      // Restore each backed up module
+      // Only restore modules that don't exist in dist or are identical to public
       for (const [module, backup] of backups) {
         const distPath = path.resolve(__dirname, 'dist', module);
+        const publicPath = path.resolve(__dirname, 'public', module);
         
         if (backup.type === 'file') {
-          fs.writeFileSync(distPath, backup.content);
-          console.log(`✅ Restored file: dist/${module}`);
-        } else if (backup.type === 'directory' && fs.existsSync(backup.source)) {
-          // Remove existing directory and copy from public
-          if (fs.existsSync(distPath)) {
-            fs.rmSync(distPath, { recursive: true, force: true });
+          // Check if the file in dist is different from public (meaning it was modified)
+          if (fs.existsSync(distPath) && fs.existsSync(publicPath)) {
+            const distContent = fs.readFileSync(distPath, 'utf-8');
+            const publicContent = fs.readFileSync(publicPath, 'utf-8');
+            
+            if (distContent !== publicContent) {
+              console.log(`🔄 Preserving modified file: dist/${module} (different from public)`);
+              // Don't restore, keep the modified version in dist
+              continue;
+            }
           }
-          copyDirectory(backup.source, distPath);
-          console.log(`✅ Restored directory: dist/${module}`);
+          
+          // If file doesn't exist in dist or is identical to public, restore from backup
+          if (!fs.existsSync(distPath)) {
+            fs.writeFileSync(distPath, backup.content);
+            console.log(`✅ Restored file: dist/${module}`);
+          }
+        } else if (backup.type === 'directory' && fs.existsSync(backup.source)) {
+          // For directories, only restore if they don't exist in dist
+          if (!fs.existsSync(distPath)) {
+            copyDirectory(backup.source, distPath);
+            console.log(`✅ Restored directory: dist/${module}`);
+          } else {
+            console.log(`🔄 Preserving existing directory: dist/${module}`);
+          }
         }
       }
       

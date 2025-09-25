@@ -156,7 +156,7 @@ export const I18N_CONFIG = {
 export const VERSION_CONFIG = {
     enabled: true,
     defaultVersion: 'v2.0',
-    versions: ['v2.0'],
+    versions: ['v2.0','v1.0'],
 };
 
 // --- MAINTENANCE MODE ---
