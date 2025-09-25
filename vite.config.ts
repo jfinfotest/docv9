@@ -7,6 +7,40 @@ import fs from 'fs';
 // Build siempre en ruta raíz - GitHub Pages manejará las rutas en el workflow
 const baseUrl = '/';
 
+// Custom plugin to preserve constants.js and replace imports
+const preserveConstants = () => {
+  let constantsBackup = null;
+  
+  return {
+    name: 'preserve-constants',
+    buildStart() {
+      // Backup the current constants.js
+      const constantsPath = path.resolve(__dirname, 'dist/constants.js');
+      if (fs.existsSync(constantsPath)) {
+        constantsBackup = fs.readFileSync(constantsPath, 'utf-8');
+        console.log('📦 Backing up dist/constants.js');
+      }
+    },
+    resolveId(id, importer) {
+      // Redirect constants.js imports to the dist version
+      if (id.includes('public/constants.js') || id.endsWith('constants.js')) {
+        const distPath = path.resolve(__dirname, 'dist/constants.js');
+        console.log(`🔄 Redirecting ${id} to ${distPath}`);
+        return distPath;
+      }
+      return null;
+    },
+    buildEnd() {
+      // Restore the constants.js after build
+      if (constantsBackup) {
+        const constantsPath = path.resolve(__dirname, 'dist/constants.js');
+        fs.writeFileSync(constantsPath, constantsBackup);
+        console.log('✅ Restored dist/constants.js');
+      }
+    }
+  };
+};
+
 // Plugin para copiar temas de Prism durante el desarrollo
 const copyPrismThemes = () => {
   return {
@@ -86,6 +120,7 @@ export default defineConfig({
   base: baseUrl,
   plugins: [
     react(), 
+    preserveConstants(),
     copyPrismThemes(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -176,10 +211,10 @@ export default defineConfig({
     global: 'globalThis'
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-    }
-  },
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
   optimizeDeps: {
     include: ['buffer']
   },

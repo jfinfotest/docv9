@@ -37,7 +37,7 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/docv9/manifest.webmanifest" />
     
-    <title id="page-title">Loading...</title>
+    <title>Static Documentation Site</title>
     
     <!-- All CSS and JS dependencies are now loaded locally via main.css and bundled modules -->
     <!-- Tailwind CSS, Animate.css, Prism.js, KaTeX styles are imported in main.css -->
@@ -74,27 +74,7 @@
 <!-- Import map removed - all dependencies are now installed locally via npm -->
   <script type="module" crossorigin src="/docv9/assets/main-f985a2e0.js"></script>
   <link rel="stylesheet" href="/docv9/assets/index-ef9b046e.css">
-<link rel="manifest" href="/docv9/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/docv9/registerSW.js"></script>
-  <script type="module">
-    // Update page title from constants.js by importing it dynamically
-    window.addEventListener('load', async function() {
-      try {
-        // Import constants.js as a module to get the latest APP_CONFIG
-        const constants = await import('./constants.js');
-        if (constants.APP_CONFIG && constants.APP_CONFIG.title) {
-          document.title = constants.APP_CONFIG.title;
-          console.log('Title updated to:', constants.APP_CONFIG.title);
-        }
-      } catch (e) {
-        console.log('Could not update title from constants.js:', e);
-        // Fallback to global APP_CONFIG if available
-        if (window.APP_CONFIG && window.APP_CONFIG.title) {
-          document.title = window.APP_CONFIG.title;
-        }
-      }
-    });
-  </script>
-</head>
+<link rel="manifest" href="/docv9/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/docv9/registerSW.js"></script></head>
 <body class="bg-white dark:bg-gray-900">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
