@@ -1,7 +1,7 @@
 // --- GENERAL APP CONFIGURATION ---
 export const APP_CONFIG = {
-    title: "FusionDocJF - UPDATED DIRECTLY",
-    subtitle: "Next-Gen Documentation - Direct Dist Update Test",
+    title: "FusionDocJFV2",
+    subtitle: "Next-Gen Documentation",
     icon: "/assets/logo.png", // Path in the `/public` folder or a full URL
 };
 

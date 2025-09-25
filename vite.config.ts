@@ -7,18 +7,62 @@ import fs from 'fs';
 // Build siempre en ruta raíz - GitHub Pages manejará las rutas en el workflow
 const baseUrl = '/';
 
-// Custom plugin to preserve constants.js and replace imports
-const preserveConstants = () => {
-  let constantsBackup = null;
+// Custom plugin to preserve external modules and replace imports
+const preserveExternalModules = () => {
+  const backups = new Map();
+  
+  // Define external modules to preserve
+  const externalModules = [
+    'constants.js',
+    'github-config.json',
+    'assets',
+    'docs',
+    'prism-languages'
+  ];
+  
+  const copyDirectory = (src, dest) => {
+    if (!fs.existsSync(src)) return;
+    
+    if (!fs.existsSync(dest)) {
+      fs.mkdirSync(dest, { recursive: true });
+    }
+    
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+    
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+      
+      if (entry.isDirectory()) {
+        copyDirectory(srcPath, destPath);
+      } else {
+        fs.copyFileSync(srcPath, destPath);
+      }
+    }
+  };
   
   return {
-    name: 'preserve-constants',
+    name: 'preserve-external-modules',
     buildStart() {
-      // Backup the current constants.js
-      const constantsPath = path.resolve(__dirname, 'dist/constants.js');
-      if (fs.existsSync(constantsPath)) {
-        constantsBackup = fs.readFileSync(constantsPath, 'utf-8');
-        console.log('📦 Backing up dist/constants.js');
+      console.log('📦 Backing up external modules...');
+      
+      // Backup each external module
+      for (const module of externalModules) {
+        const distPath = path.resolve(__dirname, 'dist', module);
+        const publicPath = path.resolve(__dirname, 'public', module);
+        
+        if (fs.existsSync(distPath)) {
+          if (fs.statSync(distPath).isDirectory()) {
+            // For directories, we'll store the backup info
+            backups.set(module, { type: 'directory', source: publicPath });
+            console.log(`📁 Marked directory for backup: dist/${module}`);
+          } else {
+            // For files, read and store content
+            const content = fs.readFileSync(distPath, 'utf-8');
+            backups.set(module, { type: 'file', content });
+            console.log(`📄 Backed up file: dist/${module}`);
+          }
+        }
       }
     },
     resolveId(id, importer) {
@@ -31,12 +75,26 @@ const preserveConstants = () => {
       return null;
     },
     buildEnd() {
-      // Restore the constants.js after build
-      if (constantsBackup) {
-        const constantsPath = path.resolve(__dirname, 'dist/constants.js');
-        fs.writeFileSync(constantsPath, constantsBackup);
-        console.log('✅ Restored dist/constants.js');
+      console.log('✅ Restoring external modules...');
+      
+      // Restore each backed up module
+      for (const [module, backup] of backups) {
+        const distPath = path.resolve(__dirname, 'dist', module);
+        
+        if (backup.type === 'file') {
+          fs.writeFileSync(distPath, backup.content);
+          console.log(`✅ Restored file: dist/${module}`);
+        } else if (backup.type === 'directory' && fs.existsSync(backup.source)) {
+          // Remove existing directory and copy from public
+          if (fs.existsSync(distPath)) {
+            fs.rmSync(distPath, { recursive: true, force: true });
+          }
+          copyDirectory(backup.source, distPath);
+          console.log(`✅ Restored directory: dist/${module}`);
+        }
       }
+      
+      console.log('🎉 All external modules preserved successfully!');
     }
   };
 };
@@ -119,8 +177,8 @@ const copyPrismThemes = () => {
 export default defineConfig({
   base: baseUrl,
   plugins: [
-    react(), 
-    preserveConstants(),
+    react(),
+    preserveExternalModules(),
     copyPrismThemes(),
     VitePWA({
       registerType: 'autoUpdate',
