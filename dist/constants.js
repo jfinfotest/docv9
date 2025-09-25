@@ -675,3 +675,8 @@ export const UI_TEXT = {
         selectLanguage: "Seleccionar idioma"
     },
 };
+
+// Expose APP_CONFIG globally for dynamic title updates
+if (typeof window !== 'undefined') {
+    window.APP_CONFIG = APP_CONFIG;
+}
