@@ -16,7 +16,7 @@ Para usar el script, hemos añadido un archivo `package.json` a la raíz de tu p
 ```json
 {
   "scripts": {
-    "update-manifest": "node scripts/update-manifest.js"
+    "update-manifest": "node public/update-file-manifest.js"
   }
 }
 ```
@@ -29,6 +29,6 @@ Cada vez que **agregues, elimines o renombres** un archivo o carpeta de Markdown
 npm run update-manifest
 ```
 
-Este comando ejecutará el script `scripts/update-manifest.js`, que reconstruirá el manifiesto con la estructura de archivos actual.
+Este comando ejecutará el script `public/update-file-manifest.js`, que reconstruirá el manifiesto con la estructura de archivos actual.
 
 > **Nota:** Si es la primera vez que ejecutas un comando `npm`, puede que necesites ejecutar `npm install` primero para asegurarte de que tu entorno local está configurado.
