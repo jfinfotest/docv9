@@ -4,13 +4,8 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import fs from 'fs';
 
-// Leer configuración de GitHub dinámicamente
-const githubConfigPath = path.join(__dirname, 'public', 'github-config.json');
-const githubConfig = fs.existsSync(githubConfigPath) 
-  ? JSON.parse(fs.readFileSync(githubConfigPath, 'utf-8'))
-  : { baseUrl: '/', repository: '' };
-
-const baseUrl = githubConfig.baseUrl || '/';
+// Build siempre en ruta raíz - GitHub Pages manejará las rutas en el workflow
+const baseUrl = '/';
 
 // Plugin para copiar temas de Prism durante el desarrollo
 const copyPrismThemes = () => {

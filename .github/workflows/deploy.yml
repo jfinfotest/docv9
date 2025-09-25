@@ -35,6 +35,26 @@ jobs:
     - name: Build project
       run: npm run build
       
+    - name: Adapt paths for GitHub Pages
+      run: |
+        # Leer configuración del repositorio
+        REPO_NAME=$(cat public/github-config.json | grep -o '"baseUrl": "[^"]*"' | cut -d'"' -f4 | sed 's|/||g')
+        
+        # Actualizar rutas en index.html
+        sed -i "s|href=\"/|href=\"/$REPO_NAME/|g" dist/index.html
+        sed -i "s|src=\"/|src=\"/$REPO_NAME/|g" dist/index.html
+        
+        # Actualizar manifest.webmanifest
+        if [ -f dist/manifest.webmanifest ]; then
+          sed -i "s|\"start_url\":\"/\"|\"start_url\":\"/$REPO_NAME/\"|g" dist/manifest.webmanifest
+          sed -i "s|\"scope\":\"/\"|\"scope\":\"/$REPO_NAME/\"|g" dist/manifest.webmanifest
+        fi
+        
+        # Actualizar service worker si existe
+        if [ -f dist/sw.js ]; then
+          sed -i "s|self.location.origin|self.location.origin + '/$REPO_NAME'|g" dist/sw.js
+        fi
+      
     - name: Create .nojekyll
       run: touch dist/.nojekyll
       
