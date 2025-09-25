@@ -7,8 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "update-file-manifest": "node public/update-file-manifest.js"
+    "preview": "vite preview"
   },
   "keywords": [
     "documentation",
